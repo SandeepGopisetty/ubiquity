@@ -583,6 +583,14 @@ func (s *spectrumLocalClient) createLightweightVolume(filesystem, name, fileset 
 		return err
 	}
 
+	//chmod 777 mountpoint
+	args = []string{"chmod", "777", lightweightVolumePath}
+	_, err = s.executor.Execute("sudo", args)
+	if err != nil {
+		s.logger.Printf("Failed to change permissions of fileset %s: %s", lightweightVolumePath, err.Error())
+		return err
+	}
+
 	err = s.dataModel.InsertLightweightVolume(fileset, lightweightVolumeName, name, filesystem, false, opts)
 
 	if err != nil {
