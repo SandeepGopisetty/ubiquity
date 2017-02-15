@@ -379,7 +379,7 @@ func (s *spectrumLocalClient) Attach(name string) (volumeMountpoint string, err 
 			return "", err
 		}
 		//open permissions of fileset if vol is LTW
-		if existingVolume.Type == VolumeType(LTWT_VOL_TYPE) {
+		if existingVolume.Type == LIGHTWEIGHT {
 			executor := utils.NewExecutor(s.logger)
 
 			fsMountpoint, err := s.connector.GetFilesystemMountpoint(existingVolume.FileSystem)
