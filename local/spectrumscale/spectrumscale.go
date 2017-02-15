@@ -575,14 +575,12 @@ func (s *spectrumLocalClient) createLightweightVolume(filesystem, name, fileset 
 	s.logger.Printf("creating directory for lwv: %s\n", lightweightVolumePath)
 
 	//open permissions of fileset if vol is LTW
-	executor := utils.NewExecutor(s.logger)
-
 	//chmod 777 mountpoint
 	args = []string{"chmod", "777", path.Join(mountpoint, fileset)}
-	_, err = executor.Execute("sudo", args)
+	_, err = s.executor.Execute("sudo", args)
 	if err != nil {
 		s.logger.Printf("Failed to change permissions of fileset %s: %s", fileset, err.Error())
-		return "", err
+		return err
 	}
 
 	err = s.dataModel.InsertLightweightVolume(fileset, lightweightVolumeName, name, filesystem, false, opts)
