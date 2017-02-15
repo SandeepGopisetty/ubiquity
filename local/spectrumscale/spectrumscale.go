@@ -378,6 +378,25 @@ func (s *spectrumLocalClient) Attach(name string) (volumeMountpoint string, err 
 			s.logger.Println(err.Error())
 			return "", err
 		}
+		//open permissions of fileset if vol is LTW
+		if existingVolume.Type == LTWT_VOL_TYPE {
+			executor := utils.NewExecutor(s.logger)
+
+			fsMountpoint, err := s.connector.GetFilesystemMountpoint(existingVolume.FileSystem)
+			if err != nil {
+				return "", err
+			}
+			filesetPath := path.Join(fsMountpoint, existingVolume.Fileset)
+
+			//chmod 777 mountpoint
+			args := []string{"chmod", "777", filesetPath}
+			_, err = executor.Execute("sudo", args)
+			if err != nil {
+				s.logger.Printf("Failed to change permissions of fileset %s: %s", existingVolume.Fileset, err.Error())
+				return "", err
+			}
+
+		}
 	}
 
 	return volumeMountpoint, nil
@@ -482,28 +501,6 @@ func (s *spectrumLocalClient) createFilesetVolume(filesystem, name string, opts 
 	s.logger.Printf("Created fileset volume with fileset %s\n", filesetName)
 	return nil
 }
-
-//func (s *spectrumLocalClient) changePermissionsOfFileset(filesystem, filesetName, uid, gid string) error {
-//	s.logger.Println("spectrumLocalClient: changeOwnerOfFileset start")
-//	defer s.logger.Println("spectrumLocalClient: changeOwnerOfFileset end")
-//
-//	s.logger.Printf("Changing Owner of Fileset %s to uid %s , gid %s", filesetName, uid, gid)
-//
-//	mountpoint, err := s.connector.GetFilesystemMountpoint(filesystem)
-//	if err != nil {
-//		s.logger.Printf("Failed to change permissions of fileset %s : %s", filesetName, err.Error())
-//		return err
-//	}
-//
-//	filesetPath := path.Join(mountpoint, filesetName)
-//	args := []string{"chown", "-R", fmt.Sprintf("%s:%s", uid, gid), filesetPath}
-//	_, err = s.executor.Execute("sudo", args)
-//	if err != nil {
-//		s.logger.Printf("Failed to change permissions of fileset %s: %s", filesetName, err.Error())
-//		return err
-//	}
-//	return nil
-//}
 
 func (s *spectrumLocalClient) createFilesetQuotaVolume(filesystem, name, quota string, opts map[string]interface{}) error {
 	s.logger.Println("spectrumLocalClient: createFilesetQuotaVolume start")
