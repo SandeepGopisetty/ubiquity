@@ -378,25 +378,25 @@ func (s *spectrumLocalClient) Attach(name string) (volumeMountpoint string, err 
 			s.logger.Println(err.Error())
 			return "", err
 		}
-		//open permissions of fileset if vol is LTW
-		if existingVolume.Type == LIGHTWEIGHT {
-			executor := utils.NewExecutor(s.logger)
-
-			fsMountpoint, err := s.connector.GetFilesystemMountpoint(existingVolume.FileSystem)
-			if err != nil {
-				return "", err
-			}
-			filesetPath := path.Join(fsMountpoint, existingVolume.Fileset)
-
-			//chmod 777 mountpoint
-			args := []string{"chmod", "777", filesetPath}
-			_, err = executor.Execute("sudo", args)
-			if err != nil {
-				s.logger.Printf("Failed to change permissions of fileset %s: %s", existingVolume.Fileset, err.Error())
-				return "", err
-			}
-
-		}
+		////open permissions of fileset if vol is LTW
+		//if existingVolume.Type == LIGHTWEIGHT {
+		//	executor := utils.NewExecutor(s.logger)
+		//
+		//	fsMountpoint, err := s.connector.GetFilesystemMountpoint(existingVolume.FileSystem)
+		//	if err != nil {
+		//		return "", err
+		//	}
+		//	filesetPath := path.Join(fsMountpoint, existingVolume.Fileset)
+		//
+		//	//chmod 777 mountpoint
+		//	args := []string{"chmod", "777", filesetPath}
+		//	_, err = executor.Execute("sudo", args)
+		//	if err != nil {
+		//		s.logger.Printf("Failed to change permissions of fileset %s: %s", existingVolume.Fileset, err.Error())
+		//		return "", err
+		//	}
+		//
+		//}
 	}
 
 	return volumeMountpoint, nil
@@ -573,6 +573,17 @@ func (s *spectrumLocalClient) createLightweightVolume(filesystem, name, fileset 
 		return err
 	}
 	s.logger.Printf("creating directory for lwv: %s\n", lightweightVolumePath)
+
+	//open permissions of fileset if vol is LTW
+	executor := utils.NewExecutor(s.logger)
+
+	//chmod 777 mountpoint
+	args = []string{"chmod", "777", path.Join(mountpoint, fileset)}
+	_, err = executor.Execute("sudo", args)
+	if err != nil {
+		s.logger.Printf("Failed to change permissions of fileset %s: %s", fileset, err.Error())
+		return "", err
+	}
 
 	err = s.dataModel.InsertLightweightVolume(fileset, lightweightVolumeName, name, filesystem, false, opts)
 
