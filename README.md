@@ -138,7 +138,7 @@ where:
 
 
 ### Next Steps - Install a plugin for Docker or Kubernetes
-To use Ubiquity, please install appropriate storage-specific plugin ([docker](https://github.com/IBM/ubiquity-docker-plugin), [kubernetes](https://github.com/IBM/ubiquity-flexvolume))
+To use Ubiquity, please install appropriate storage-specific plugin ([docker](https://github.com/IBM/ubiquity-docker-plugin), [kubernetes](https://github.com/IBM/ubiquity-k8s))
 
 ## Available Storage Systems
 
